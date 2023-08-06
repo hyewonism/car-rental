@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cars Detail</title>
+    <link rel="stylesheet" href="carsdetail.css" class="rel" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://kit.fontawesome.com/b79eeb51a3.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+	{% include 'header.html' %}
+
+    <main>
+      <div class="container">
+        <div class="row">
+
+           {% for car in jinja_car_rentals %}
+            <div class="col-md-7 img-wrapper">
+              <img src="{{ car.image }}" height="550px" width="800px" class="img-fluid" alt="..." />
+            </div>
+            <div class="col-md-5">
+              <h2>{{car.model}}</h2>
+              <p>
+                {{ car.description }}
+              </p>
+          
+              <p><b class="price">{{ car.rental_per_day }}</b><b class="price-detail">/per day</b></p>
+              <div class="car-detail">
+          
+                <p><i class="fa-regular fa-clipboard"></i><b>   Registration number : </b>{{ car.registration_number }}</p>
+                <p><i class="fa-solid fa-car"></i><b>   Year : {{ car.year }}</b></p>
+                <p><i class="fa-solid fa-users"></i><b>   Seating capacity : {{ car.seating_capacity }}</b></p>
+                <div class="rental-date">
+                  <p><i class="fa-regular fa-calendar-check"></i><b>   Pick-up date</b><input type="date"></input></p> 
+                  <p><i class="fa-regular fa-calendar-check"></i><b>   Drop-off date</b><input type="date"></input></p> 
+                </div>
+                <div class="button book-btn">
+                  <button type="button" class="btn btn-default cart">Book</button>
+                </div>
+            {% endfor %}
+
+   
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

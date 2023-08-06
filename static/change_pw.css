@@ -1,0 +1,155 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #116466 !important;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+main {
+  padding-top: 20px;
+  margin-left: 230px;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  padding: 20px 100px;
+  background-color: #2c3531;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 32px;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.navbar a {
+  position: relative;
+  font-size: 18px;
+  color: #fff !important;
+  font-weight: 500;
+  text-decoration: none !important;
+  margin-left: 40px;
+}
+
+.navbar a::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #fff;
+  transition: 0.3s;
+}
+
+.navbar a:hover::before {
+  width: 100%;
+}
+
+.side-bar {
+  margin-top: 70px;
+  background: #e3dcd2;
+  width: 230px;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  overflow-y: auto;
+  transition: 0.6s ease;
+  transition-property: left;
+}
+
+.menu {
+  width: 100%;
+  margin-top: 30px;
+}
+
+.item {
+  position: relative;
+  cursor: pointer;
+}
+
+.menu .item {
+  color: #2c3531 !important;
+  font-size: 16px !important;
+  text-decoration: none !important;
+  display: block;
+  padding: 5px 30px;
+  line-height: 60px;
+}
+
+.menu .item a {
+  color: #2c3531;
+  font-size: 16px;
+  text-decoration: none;
+  display: block;
+  font-weight: 600;
+  line-height: 60px;
+  padding: 10px 10px;
+}
+
+.item i {
+  margin-right: 15px;
+}
+
+.item .sub-menu {
+  background: #e3dcd2;
+  display: none;
+}
+
+.tab-content {
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.nav-pills a.nav-link {
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+  border-radius: 0;
+  color: #333;
+}
+.nav-pills a.nav-link i {
+  width: 20px;
+}
+
+.form-group label {
+  color: #2c3531;
+  font-weight: bold;
+}
+
+main h3 {
+  color: #fff;
+  font-size: 35px;
+}
+
+.row {
+  background-color: rgba(255, 255, 255, 0.3);
+  padding: 20px 10px;
+  border-radius: 15px;
+  width: 800px;
+  margin-bottom: 30px;
+}
+
+main a {
+  text-decoration: none;
+  color: white;
+}

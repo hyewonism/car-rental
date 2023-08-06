@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard_Car_Edit</title>
+    <link rel="stylesheet" href="profile.css">
+    <script src="https://kit.fontawesome.com/b79eeb51a3.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
+      crossorigin="anonymous"
+    />
+</head>
+
+  <body>
+	{% include 'header.html' %}
+
+	{% include 'sidebar.html' %}
+
+    <main>
+    <div class="tab-content p-4 p-md-5" id="v-pills-tabContent">
+					<form class="tab-pane fade show active" id="account" role="tabpanel" aria-labelledby="account-tab">
+						<h3 class="mb-4">Edit car</h3>
+						<form action="/dash_car_edit_update" method="post">
+						<input type="hidden" name="registration_number" value="{{car_rental.registration_number}}" />	
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+								  	<label>Model</label>
+								  	<input type="text" class="form-control" name= "model" value="{{car_rentals.model}}">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+								  	<label>Registration number</label>
+								  	<input type="text" class="form-control" name = "registration_number" value="{{registration_number.model}}">
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+								  	<label>Year</label>
+								  	<input type="text" class="form-control" name= "year" value="{{year.model}}">
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+								  	<label>Seating capacity</label>
+								  	<input type="number" class="form-control" name = "seating_capacity" value="{{seating_capacity.model}}">
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="form-group">
+								  	<label>Rental per day</label>
+								  	<input type="number" class="form-control" name= "rental_per_day" value="{{rental_per_day.model}}">
+								</div>
+							</div>
+
+							<div class="col-md-12">
+								<div class="form-group">
+								  	<label>Description</label>
+									<textarea class="form-control" name = "description" rows="2" value = "{{car_rentals.description}}"></textarea>
+								</div>
+							</div>
+
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Car Photo</label>
+                                    <input type="file" class="form-control-file" name = "image" value="{{car_rentals.image}}" accept="image/">
+                                </div>
+                            </div>
+
+						</div>
+
+						<div class="submit">
+							<button class="btn btn-dark">Update</button>
+						</div>
+						</form>
+					</div>
+    
+    
+    
+    </main>
+
+
+
+
+  </body>
+</html>

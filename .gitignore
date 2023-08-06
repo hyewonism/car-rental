@@ -1,0 +1,11 @@
+# Pycache
+__pycache__
+
+# Virtualenv
+venv
+
+# Security
+.env
+
+# Etc
+.DS_Store
