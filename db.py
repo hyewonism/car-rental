@@ -4,6 +4,12 @@ import os
 
 load_dotenv()
 
+def check_connection(method):
+    def wrapper(instance, *args, **kwargs):
+        instance._check_db_connection()
+        return method(instance, *args, **kwargs)
+    return wrapper
+
 class DbManager:
     """
     Implement using singleton pattern
@@ -14,34 +20,47 @@ class DbManager:
         if cls._instance is None:
             cls._instance = super(DbManager, cls).__new__(cls)
             cls._instance._initialized = False
+            cls._instance._initialize_connection()
         return cls._instance
 
-    def __init__(self):
-        # Check if it was initialized already
+    def _initialize_connection(self):
+        # Initialize the connection only once
+        if not self._initialized:
+            self.connection = mysql.connector.connect(
+                user=os.getenv('DB_USER'),
+                password=os.getenv('DB_PASSWORD'),
+                host=os.getenv('DB_HOST'),
+                port=os.getenv('DB_PORT'),
+                database=os.getenv('DB_DATABASE'),
+            )
+            self.dbconn = self.connection.cursor(dictionary=True)
+            self._initialized = True
+
+    def _check_db_connection(self):
+        try:
+            self.dbconn.execute("SELECT * FROM car_rental LIMIT 1")
+        except mysql.connector.errors.DatabaseError:
+            self._initialized = False
+            self._initialize_connection()
+
+    def close(self):
+        """
+        Explicitly close the connection
+        """
         if self._initialized:
-            return
-
-        self.connection = mysql.connector.connect(
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASSWORD'),
-            host=os.getenv('DB_HOST'),
-            port=os.getenv('DB_PORT'),
-            database=os.getenv('DB_DATABASE'),
-        )
-
-        self.dbconn = self.connection.cursor(dictionary=True)
-        self._initialized = True
+            self.dbconn.close()
+            self.connection.close()
+            print('db connection closed')
 
     def __del__(self):
-        print('db connection closed')
-        # self.dbconn.close()
-        # self.connection.close()
+        self.close()
 
+    @check_connection
     def create_car_rental(self, data):
         """
         Create a car rental 
 
-        inputs:
+        Arguments:
         - data: dictionary of car rental (model, registration_number, year, seating_capacity, rental_per_day, image, description)
         """
         model = data['model']
@@ -60,11 +79,12 @@ class DbManager:
         
         self.connection.commit()
 
+    @check_connection
     def fetch_car_rentals(self):
         """
         Read all car rental records
 
-        outputs:
+        Returns:
         - list of car rentals
         """
         # Execute sql
@@ -78,13 +98,15 @@ class DbManager:
 
         return cars
 
+    @check_connection
     def fetch_car_rental_by_id(self, id):
         """
         Fetch a car rental record by id
 
-        inputs:
+        Arguments:
         - id: car rental record pk
-        outputs:
+
+        Returns:
         - dictionary of a car rental 
         """
         # Execute sql
@@ -99,11 +121,12 @@ class DbManager:
 
         return car
 
+    @check_connection
     def update_car_rental(self, data):
         """
         Update a car rental 
 
-        inputs:
+        Arguments:
         - data: dictionary of car rental (id, model, registration_number, year, seating_capacity, rental_per_day, image, description)
         """
         id = data['id']
@@ -123,11 +146,12 @@ class DbManager:
         
         self.connection.commit()
 
+    @check_connection
     def delete_car_rental(self, id):
         """
         Delete a car rental record by id
 
-        inputs:
+        Arguments:
         - id: car rental record pk
         """
         # Execute sql
@@ -140,13 +164,15 @@ class DbManager:
         self.connection.commit()
 
 
+    @check_connection
     def create_user(self, data):
         """
         Create a user 
 
-        inputs:
+        Arguments:
         - data: dictionary of user (username, password, role)
-        outputs:
+
+        Returns:
         - created user id(pk)
         """
         username = data['username']
@@ -163,11 +189,12 @@ class DbManager:
 
         return self.dbconn.lastrowid
 
+    @check_connection
     def fetch_users(self):
         """
         Read all user records
 
-        outputs:
+        Returns:
         - list of user
         """
         # Execute sql
@@ -181,13 +208,15 @@ class DbManager:
 
         return users
 
+    @check_connection
     def fetch_user_by_id(self, id):
         """
         Fetch a user record by id
 
-        inputs:
+        Arguments:
         - id: user record pk
-        outputs:
+
+        Returns:
         - dictionary of user
         """
         # Execute sql
@@ -202,13 +231,15 @@ class DbManager:
 
         return user
 
+    @check_connection
     def fetch_user_by_username(self, username):
         """
         Fetch a user record by username
 
-        inputs:
+        Arguments:
         - username: username field value
-        outputs:
+
+        Returns:
         - dictionary of user OR None
         """
         # Execute sql
@@ -223,11 +254,12 @@ class DbManager:
 
         return user
 
+    @check_connection
     def update_user(self, data):
         """
         Update a user
 
-        inputs:
+        Arguments:
         - data: dictionary of user (user_id, username, password)
         """
         id = data['user_id']
@@ -242,12 +274,12 @@ class DbManager:
         
         self.connection.commit()
 
-
+    @check_connection
     def delete_user(self, id):
         """
         Delete a user record by id
 
-        inputs:
+        Arguments:
         - id: user record pk
         """
         # Execute sql
@@ -261,11 +293,12 @@ class DbManager:
 
 
 
+    @check_connection
     def create_customer(self, data):
         """
         Create a customer
 
-        inputs:
+        Arguments:
         - data: dictionary of customer (user_id, name, address, email, phone_number)
         """
         user_id = data['user_id']
@@ -283,11 +316,12 @@ class DbManager:
         self.connection.commit()
 
 
+    @check_connection
     def fetch_customers(self):
         """
         Read all customer records
 
-        outputs:
+        Returns:
         - list of customer
         """
         # Execute sql
@@ -302,6 +336,7 @@ class DbManager:
         return customers
 
 
+    @check_connection
     def fetch_customer_by_user_id(self, user_id):
         """
         Fetch a customer record using a user_id
@@ -325,6 +360,7 @@ class DbManager:
         return customer
 
     
+    @check_connection
     def update_customer_by_user_id(self, data):
         """
         Update a customer record using a user_id
@@ -347,6 +383,7 @@ class DbManager:
         self.connection.commit()
     
 
+    @check_connection
     def delete_customer_by_user_id(self, user_id):
         """
         Delete a customer record using a user_id
@@ -365,11 +402,12 @@ class DbManager:
 
 
 
+    @check_connection
     def create_staff(self, data):
         """
         Create a staff
 
-        inputs:
+        Arguments:
         - data: dictionary of staff (user_id, name, address, email, phone_number)
         """
         user_id = data['user_id']
@@ -387,11 +425,12 @@ class DbManager:
         self.connection.commit()
 
 
+    @check_connection
     def fetch_staffs(self):
         """
         Read all staff records
 
-        outputs:
+        Returns:
         - list of staff
         """
         # Execute sql
@@ -406,6 +445,7 @@ class DbManager:
         return staffs
 
 
+    @check_connection
     def fetch_staff_by_user_id(self, user_id):
         """
         Fetch a staff record using a user_id
@@ -429,6 +469,7 @@ class DbManager:
         return staff
 
 
+    @check_connection
     def update_staff_by_user_id(self, data):
         """
         Update a staff record using a user_id
@@ -451,6 +492,7 @@ class DbManager:
         self.connection.commit()
 
 
+    @check_connection
     def delete_staff_by_user_id(self, user_id):
         """
         Delete a staff record using a user_id

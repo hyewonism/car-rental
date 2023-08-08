@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, send_from_directory
 from db import db
+from utils import random_string
 from decorator import admin_only, customer_staff_only, staff_admin_only
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 import os
 
@@ -9,6 +11,10 @@ load_dotenv()
 
 
 app = Flask(__name__, static_url_path="/")
+
+@app.route('/')
+def index():
+    return redirect('/home')
 
 ########## CAR PAGES ############
 
@@ -20,9 +26,9 @@ def cars():
 
 @app.route('/cars_detail')
 def cardetail():
-
-    car_rentals = db.fetch_car_rentals()
-    return render_template("Cars/carsdetail.html", car_rentals=car_rentals)
+    id = request.args['id']
+    car_rental = db.fetch_car_rental_by_id(id)
+    return render_template("Cars/carsdetail.html", car=car_rental)
 
 
 ########## DASHBOARD PAGES ############
@@ -38,7 +44,12 @@ def dash_car_add():
 def car_add_create():
     data = dict(request.form)
 
-    # TODO: Store image in local storage
+    # Store image in local storage
+    image = request.files['image']
+    filename = secure_filename(random_string(10) + image.filename)
+    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    image.save(path)
+    data['image'] = path
 
     db.create_car_rental(data)
 
@@ -48,38 +59,40 @@ def car_add_create():
 @app.route('/dash_car_edit')
 @staff_admin_only
 def dash_car_edit():
-    # TODO: Implement this
-
-    data = request.args
-    registration_number = data['registration_number']
-    car_rental = db.fetch_car_rental_by_id(registration_number)
-
+    car_rental = db.fetch_car_rental_by_id(request.args['id'])
     return render_template("Dashboard/CarInfo/dash_car_edit.html", car_rental=car_rental)
 
-@app.route('/dash_car_edit_update', methods=['POST'])
-@admin_only
-def dash_car_edit_update():
-    data = request.form 
 
-    db.update_car_rental_by_registration_number(data)
+@app.route('/dash_car_edit_update', methods=['POST'])
+@staff_admin_only
+def dash_car_edit_update():
+    data = dict(request.form)
+
+    # Store image in local storage
+    image = request.files['image']
+    if image.filename != '':
+        filename = secure_filename(random_string(10) + image.filename)
+        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        image.save(path)
+        data['image'] = path
+    else:
+        data['image'] = data['prev_image']
+
+    db.update_car_rental(data)
 
     return redirect('/dash_cars')
 
-@app.route('/dash_car_delete')
-@admin_only
-def dash_car_delete():
-    data = request.args
 
-    registration_number = data['registration_number']
-    db.delete_car_rental_by_user_id(registration_number)
+@app.route('/dash_car_delete')
+@staff_admin_only
+def dash_car_delete():
+    db.delete_car_rental(request.args['id'])
 
     return redirect('/dash_cars')
 
 @app.route('/dash_cars')
 @staff_admin_only
 def dash_cars():
-    # TODO: Implement this
-
     car_rentals = db.fetch_car_rentals()
     return render_template("Dashboard/CarInfo/dash_cars.html", car_rentals=car_rentals)
 
@@ -99,6 +112,8 @@ def cust_add_create():
     data['role'] = 'customer'
 
     # 1. Create user record
+    hashed_password = generate_password_hash(data['password'])
+    data['password'] = hashed_password
     user_id = db.create_user(data)
 
     # 2. Create customer record
@@ -120,10 +135,17 @@ def cust_edit():
 
     return render_template("Dashboard/CustomerInfo/cust_edit.html", customer=customer, user=user)
 
+
 @app.route('/cust_edit_update', methods=['POST'])
 @admin_only
 def cust_edit_update():
-    data = request.form 
+    data = dict(request.form)
+
+    if data['password']:
+        hashed_password = generate_password_hash(data['password'])
+        data['password'] = hashed_password
+    else:
+        data['password'] = data['prev_password']
 
     db.update_customer_by_user_id(data)
     db.update_user(data)
@@ -160,10 +182,20 @@ def staff_add():
 @app.route('/staff_add_create', methods=['POST'])
 @admin_only
 def staff_add_create():
+    # Add addtional colume value
     data = dict(request.form)
-    # TODO: Implement this
+    data['role'] = 'staff'
 
+    # 1. Create user record
+    hashed_password = generate_password_hash(data['password'])
+    data['password'] = hashed_password
+    user_id = db.create_user(data)
+
+    # 2. Create staff record
+    data['user_id'] = user_id
     db.create_staff(data)
+
+    # Redirect to /staff_list
     return redirect('/staff_list')
 
 
@@ -173,23 +205,31 @@ def staff_edit():
     """
     Staff edit page for admin user
     """
-    # TODO: Implement this
     data = request.args
 
     user_id = data['user_id']
     staff = db.fetch_staff_by_user_id(user_id)
+    user = db.fetch_user_by_id(user_id)
 
-    return render_template("Dashboard/StaffInfo/staff_edit.html", staff=staff)
+    return render_template("Dashboard/StaffInfo/staff_edit.html", staff=staff, user=user)
 
 
 @app.route('/staff_edit_update', methods=['POST'])
 @admin_only
 def staff_edit_update():
-    data = request.form 
+    data = dict(request.form)
+
+    if data['password']:
+        hashed_password = generate_password_hash(data['password'])
+        data['password'] = hashed_password
+    else:
+        data['password'] = data['prev_password']
 
     db.update_staff_by_user_id(data)
+    db.update_user(data)
 
     return redirect('/staff_list')
+
 
 @app.route('/staff_delete')
 @admin_only
@@ -198,31 +238,86 @@ def staff_delete():
 
     user_id = data['user_id']
     db.delete_staff_by_user_id(user_id)
+    db.delete_user(user_id)
 
     return redirect('/staff_list')
+
 
 @app.route('/staff_list')
 @admin_only
 def staff_list():
-    # TODO: Get all staff records
-
     staffs = db.fetch_staffs()
-    return render_template("Dashboard/StaffInfo/staff_edit.html", staffs=staffs)
+    return render_template("Dashboard/StaffInfo/staff_list.html", staffs=staffs)
 
 
 @app.route('/change_pw')
 @customer_staff_only
 def change_pw():
-    # TODO: Implement this
     return render_template("Dashboard/MyProfile/change_pw.html")
+
+
+@app.route('/change_pw_update', methods=['POST'])
+@customer_staff_only
+def change_pw_update():
+    data = request.form
+    user = session['user']
+
+    is_valid = True
+    error = []
+    if not check_password_hash(user['password'], data['old_password']):
+        is_valid = False
+        error.append('Old password is not correct')
+
+    if not (data['new_password'] == data['confirm_password']):
+        is_valid = False
+        error.append('New password and Confirm password are not the same')
+
+    if is_valid:
+        db.update_user({
+            'user_id': user['id'],
+            'username': user['username'],
+            'password': generate_password_hash(data['new_password'])
+        })
+
+        return redirect("/profile")
+    else:
+        return render_template("Dashboard/MyProfile/change_pw.html", error=error)
 
 
 @app.route('/profile')
 @customer_staff_only
 def profile():
-    # TODO: Implement this
-    return render_template("Dashboard/MyProfile/profile.html")
+    user = session['user']
+    if user['role'] == 'customer':
+        p = db.fetch_customer_by_user_id(user['id'])
+    else:
+        p = db.fetch_staff_by_user_id(user['id'])
+    return render_template("Dashboard/MyProfile/profile.html", profile=p, user=user)
 
+
+@app.route('/profile_update', methods=['POST'])
+@customer_staff_only
+def profile_update():
+    data = dict(request.form)
+    user = session['user']
+
+    # Add exist password
+    data['password'] = user['password']
+
+    # Update user
+    db.update_user(data)
+
+    # Update profile
+    if user['role'] == 'customer':
+        db.update_customer_by_user_id(data)
+    else:
+        db.update_staff_by_user_id(data)
+
+    # Update session
+    user['username'] = data['username']
+    session['user'] = user
+
+    return redirect('/profile')
 
 
 ########## HOME PAGES ############
@@ -250,16 +345,15 @@ def login_check():
             is_valid = True
 
     if is_valid:
-        session['user_id'] = user['id']
-
-
+        #session['user_id'] = user['id']
+        session['user'] = user
 
         # if 'next' exists, redirect using it
         if 'next' in request.form:
             return redirect(request.form['next'])
         return redirect('/home')
     else:
-        return render_template("Login/login.html", data=data)
+        return render_template("Login/login.html", data=data, next=request.form.get('next'))
 
 
 @app.route('/regi')
@@ -301,5 +395,20 @@ def regi_create():
         return render_template("Registration/regi2.html", error=error, data=data)
 
 
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect('/home')
+
+
+@app.route('/media/<path:path>')
+def send_media(path):
+    """
+    Media serving for develop environment
+    """
+    return send_from_directory('media', path)
+
+
+app.config['UPLOAD_FOLDER'] = 'media'
 app.secret_key=os.getenv('SECRET_KEY')
-app.run(debug=True)
+app.run(debug=True, port=5002)

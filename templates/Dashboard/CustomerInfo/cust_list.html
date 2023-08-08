@@ -23,9 +23,12 @@
         <div class="table">
             <div class="table_header">
                 <p>Our Custromer Info</p>
+
+                {% if session.user.role == 'admin' %}
                 <div>
                     <button class="add_new button"><a href="/cust_add">+ Add Cutomer</a></button>
                 </div>
+                {% endif %}
             </div>
 
             <div class="table_section">
@@ -38,7 +41,9 @@
                             <th><span class="las la-sort"></span>Mobile</th>
                             <th><span class="las la-sort"></span>Email</th>
                             <th><span class="las la-sort"></span>Address</th>
+                            {% if session.user.role == 'admin' %}
                             <th><span class="las la-sort"></span>Action</th>
+                            {% endif %}
                         </tr>
                     </thead>
 
@@ -56,10 +61,12 @@
                             <td>{{ customer.phone_number }}</td>
                             <td>{{ customer.email }}</td>
                             <td>{{ customer.address }}</td>
+                            {% if session.user.role == 'admin' %}
                             <td>
                                 <a href="/cust_edit?user_id={{customer.user_id}}"><i class="fa-solid fa-pen-to-square"></i></a>
                                 <a href="/cust_delete?user_id={{customer.user_id}}"><i class="fa-solid fa-trash"></i></a>
                             </td>
+                            {% endif %}
                         </tr>
                     </tbody>
                     {% endfor %}

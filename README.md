@@ -1,7 +1,5 @@
 # Car Rental Project
 
-This project is ...
-
 ## Getting Started
 
 ### Install packages

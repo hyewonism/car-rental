@@ -25,33 +25,43 @@
         <div class="tab-content p-4 p-md-5" id="v-pills-tabContent">
             <div class="tab-pane fade show active" id="account" role="tabpanel" aria-labelledby="account-tab">
                 <h3 class="mb-4">Password Settings</h3>
+                <form action="change_pw_update" method="post">
                     <div class="boundary">
+                        {% if error|length > 0 %}
+                        <div class="alert alert-danger row" role="alert">
+                            {% for e in error %}
+                            <div class="py-1">
+                                {{e}}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                         <label>Old password</label>
-                                        <input type="password" class="form-control">
+                                        <input type="password" name="old_password" class="form-control">
                                 </div>
                             </div>
                        
                             <div class="col-md-6">
                                 <div class="form-group">
                                         <label>New password</label>
-                                        <input type="password" class="form-control">
+                                        <input type="password" name="new_password" class="form-control">
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
                                         <label>Confirm new password</label>
-                                        <input type="password" class="form-control">
+                                        <input type="password" name="confirm_password" class="form-control">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-dark"><a href="#">Update</a></button>
-                    <button class="btn btn-secondary"><a href="">Cancel</a></button>
-                    </div>
+                    <button class="btn btn-dark">Update</button>
+                    <a href="/profile" class="btn btn-secondary">Cancel</a>
+                </form>
             </div>        
         </div>
     </main>

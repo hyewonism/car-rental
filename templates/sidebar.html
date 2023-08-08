@@ -1,8 +1,19 @@
 <div class="side-bar">
     <div class="menu">
-        <div class="item"><a href=""><i class="fa-solid fa-user"></i>My Profile</a></div>
-        <div class="item"><a href=""><i class="fa-solid fa-users"></i>Customer Info</a></div>
-        <div class="item"><a href=""><i class="fa-solid fa-car"></i>Car Info</a></div>
-        <div class="item"><a href=""><i class="fa-solid fa-clipboard-user"></i>Staff Info</a></div>
+        {% if session.user.role == 'customer' or session.user.role == 'staff' %}
+        <div class="item"><a href="/profile"><i class="fa-solid fa-user"></i>My Profile</a></div>
+        {% endif %}
+
+        {% if session.user.role == 'staff' or session.user.role == 'admin' %}
+        <div class="item"><a href="/cust_list"><i class="fa-solid fa-users"></i>Customer Info</a></div>
+        {% endif %}
+
+        {% if session.user.role == 'staff' or session.user.role == 'admin' %}
+        <div class="item"><a href="/dash_cars"><i class="fa-solid fa-car"></i>Car Info</a></div>
+        {% endif %}
+
+        {% if session.user.role == 'admin' %}
+        <div class="item"><a href="/staff_list"><i class="fa-solid fa-clipboard-user"></i>Staff Info</a></div>
+        {% endif %}
     </div>
 </div>

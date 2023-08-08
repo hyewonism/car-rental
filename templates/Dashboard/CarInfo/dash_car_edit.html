@@ -23,54 +23,64 @@
 
     <main>
     <div class="tab-content p-4 p-md-5" id="v-pills-tabContent">
-					<form class="tab-pane fade show active" id="account" role="tabpanel" aria-labelledby="account-tab">
+					<div class="tab-pane fade show active" id="account" role="tabpanel" aria-labelledby="account-tab">
 						<h3 class="mb-4">Edit car</h3>
-						<form action="/dash_car_edit_update" method="post">
-						<input type="hidden" name="registration_number" value="{{car_rental.registration_number}}" />	
+						<form action="/dash_car_edit_update" method="post" enctype="multipart/form-data">
+						<input type="hidden" name="id" value="{{car_rental.id}}" />	
 						<div class="row">
 							<div class="col-md-6">
 								<div class="form-group">
 								  	<label>Model</label>
-								  	<input type="text" class="form-control" name= "model" value="{{car_rentals.model}}">
+								  	<input type="text" class="form-control" name= "model" value="{{car_rental.model}}">
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
 								  	<label>Registration number</label>
-								  	<input type="text" class="form-control" name = "registration_number" value="{{registration_number.model}}">
+								  	<input type="text" class="form-control" name = "registration_number" value="{{car_rental.registration_number}}">
 								</div>
 							</div>
 							<div class="col-md-4">
 								<div class="form-group">
 								  	<label>Year</label>
-								  	<input type="text" class="form-control" name= "year" value="{{year.model}}">
+								  	<input type="text" class="form-control" name= "year" value="{{car_rental.year}}">
 								</div>
 							</div>
 							<div class="col-md-4">
 								<div class="form-group">
 								  	<label>Seating capacity</label>
-								  	<input type="number" class="form-control" name = "seating_capacity" value="{{seating_capacity.model}}">
+								  	<input type="number" class="form-control" name = "seating_capacity" value="{{car_rental.seating_capacity}}">
 								</div>
 							</div>
 							<div class="col-md-4">
 								<div class="form-group">
 								  	<label>Rental per day</label>
-								  	<input type="number" class="form-control" name= "rental_per_day" value="{{rental_per_day.model}}">
+								  	<input type="number" class="form-control" name= "rental_per_day" value="{{car_rental.rental_per_day}}">
 								</div>
 							</div>
 
 							<div class="col-md-12">
 								<div class="form-group">
 								  	<label>Description</label>
-									<textarea class="form-control" name = "description" rows="2" value = "{{car_rentals.description}}"></textarea>
+									<textarea class="form-control" name = "description" rows="2">{{car_rental.description}}</textarea>
 								</div>
 							</div>
 
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Car Photo</label>
-                                    <input type="file" class="form-control-file" name = "image" value="{{car_rentals.image}}" accept="image/">
+                                    <input type="file" class="form-control-file" name = "image" value="{{car_rental.image}}" accept="image/">
                                 </div>
+								<div class="car-image">
+									<span>Prev Photo: </span>
+									<img
+									  src="{{ car_rental.image }}"
+									  height="50px"
+									  width="50px"
+									  alt=""
+									/>
+								</div>
+								<input type="hidden" name="prev_image" value="{{car_rental.image}}" />
                             </div>
 
 						</div>

@@ -25,7 +25,7 @@
         <div class="table_header">
           <p>Our Car Info</p>
           <div>
-            <button class="add_new button"><a href="#">+ Add Car</a></button>
+            <a href="/dash_car_add" class="add_new button">+ Add Car</a>
           </div>
         </div>
 
@@ -43,7 +43,7 @@
               </tr>
             </thead>
 
-            {% for car in jinja_car_rentals %}
+            {% for car in car_rentals %}
             <tbody>
               <tr>
                 <td>{{ car.registration_number }}</td>
@@ -63,13 +63,13 @@
                 <td>{{ car.rental_per_day }}</td>
                 <td>
                   <a
-                    href="/dash_car_edit?registration_number={{car_rentals.registration}}"
+                    href="/dash_car_edit?id={{car.id}}"
                     ><i class="fa-solid fa-pen-to-square"></i
                   ></a>
-                  <a
-                    href="/dash_car_delete?registration_number={{car_rentals.registration}}"
-                    ><i class="fa-solid fa-trash"></i
-                  ></a>
+                  <form action="/dash_car_delete" method="get" class="icon-button-form" onsubmit="return confirm('Are you really going to delete it?')">
+                    <input type="hidden" name="id" value="{{car.id}}" />
+                    <button><i class="fa-solid fa-trash"></i></button>
+                  </form>
                 </td>
               </tr>
             </tbody>

@@ -9,3 +9,6 @@ venv
 
 # Etc
 .DS_Store
+
+# Media
+media

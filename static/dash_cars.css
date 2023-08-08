@@ -10,7 +10,6 @@ body {
   background-color: #116466 !important;
   background-size: cover;
   background-position: center;
-  overflow: hidden;
 }
 
 main {
@@ -262,4 +261,13 @@ td {
 
 tbody i {
   color: #2c3531;
+}
+
+.icon-button-form {
+  display: inline;
+}
+
+.icon-button-form > button {
+  display: inline;
+  border: none;
 }

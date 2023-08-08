@@ -1,4 +1,4 @@
-/* database 확인 */
+/* check database */
 show databases;
 
 /* define database */

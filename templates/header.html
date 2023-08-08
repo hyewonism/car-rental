@@ -1,14 +1,24 @@
 <div class="container mb-5">
     <header class="header">
       <span class="logo"
-        ><i class="fa-solid fa-car"></i></i>  LU Rental Car</span>
+        ><i class="fa-solid fa-car"></i>  LU Rental Car</span>
       
       <nav class="navbar">
         <a href="/home">Home</a>
         <a href="/cars">Cars</a>
-        <a href="/profile">Dash Board</a>
+        {% if session.user %}
+          {% if session.user.role == 'admin' %}
+          <a href="/cust_list">DashBoard</a>
+          {% else %}
+          <a href="/profile">DashBoard</a>
+          {% endif %}
+        {% endif %}
         <a href="#">|</a>
-        <a href="/login">Login</a>
+        {% if session.user %}
+          <a href="/logout">Logout</a>
+        {% else %}
+          <a href="/login">Login</a>
+        {% endif %}
       </nav>
     </header>
   </div>
